@@ -1,15 +1,17 @@
+#
+#  Quick and dirty data converter
+#  created at make.opendata.ch 2011
+#
 from couchdbkit import *
 from couchdbkit.loaders import FileSystemDocsLoader
 from uuid import uuid4
 import datetime
 import time
 import csv
-
-#from sqlalchemy import *
-#from sqlalchemy.orm import mapper
 import os
 import unicodedata
 
+# define the data fields we will keep
 class Batiment(Document):
   EGID = IntegerProperty()
   ANNEE = IntegerProperty()
@@ -31,7 +33,7 @@ def csv_to_couch_dump():
   server = Server()
   db = server.get_or_create_db("energie-batiments")
   
-  # init the object<  
+  # init the object  
   Batiment.set_db(db)
 
   i = 0
@@ -57,6 +59,8 @@ def csv_to_couch_dump():
 
     batiment.save()
     i = i + 1
+
+    # comment out these two lines to grab all data (30 min on my machine..)
     if i == 1000:
       break
 

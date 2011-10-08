@@ -1,4 +1,5 @@
 {
     "name": "energie-lausanne",
-    "description": "CouchApp (énergie du quartier: Lausanne)"
+    "description": "CouchApp",
+    "index": "index.html"
 }

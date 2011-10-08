@@ -33,9 +33,6 @@
 
 	<!-- CSS: screen, mobile & print are all in the same file -->
 	<link rel="stylesheet" href="css/style.css">
-	
-  <!-- Extra libs -->
-  <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
   
 </head>
 
@@ -54,10 +51,9 @@
 		<p>Type the name of your street and we'll show you how green it is!</p>
 	
 		<label for="street">Street name</label>
-    <input type="text" id="street-input" name="street" />
-    <button id="street-search">GO</button>
+    <input type="text" name="street" />
 		
-    <div id="street-results"></div>
+    <ul id="street-results"></ul>
 			
 	</article>
 
@@ -84,14 +80,17 @@
 
 <!-- here comes the javascript -->
 <script src="vendor/couchapp/loader.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 
-<sscript type="text/javascript" src="http://api.geo.admin.ch/loader.js"></sscript>
+<!-- Geo Admin API for showing a map 
+<script type="text/javascript" src="http://api.geo.admin.ch/loader.js"></sscript>
+-->
 
 <!-- this is where we put our custom functions -->
-<script>
+<script type="text/javascript" charset="utf-8">
+
 var resultMap;
 
+// clean text for use in regexp searches
 function regesc(text) {
   if (! arguments.callee.sRE) {
     var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\' ];
@@ -100,6 +99,7 @@ function regesc(text) {
   return text.replace(arguments.callee.sRE, '\\$1');
 };
 
+// grab the next letter, useful for Couch queries
 function nextLetter(s) {
     return s.replace(/([a-zA-Z])[^a-zA-Z]*$/, function(a){
         var c= a.charCodeAt(0);
@@ -111,10 +111,47 @@ function nextLetter(s) {
     });
 }
 
+function showStreetResults(dbView) {
+
+  $('.eco-houses').html('');
+  var i = 0; var avg = 0;
+  for (var r in dbView.rows) {
+    if (dbView.rows[r].value) {
+      avg += dbView.rows[r].value.IDE_TOT_MJ;
+      i++;
+      var c = 
+        (dbView.rows[r].value.IDE_TOT_MJ > 400) ? "red" :
+        (dbView.rows[r].value.IDE_TOT_MJ < 100) ? "green" : "yellow";
+      if ($('.eco-houses span').length < 10) {
+        $('.eco-houses').append('<span id="' + dbView.rows[r].value.EGID + '" class="eco-house eco-' + c + '">' + c + '</span>');
+      }
+    }
+  }
+  $('.eco-slider').show();
+
+  avg = avg / i;
+  avg = 100 * (avg / 500);
+
+  var letter =  (avg < 20) ? "A" : 
+                (avg < 40) ? "B" :
+                (avg < 60) ? "C" :
+                (avg < 80) ? "D" :
+                (avg < 90) ? "E" :
+                "F";
+  
+  $('.eco-slider .arrow').css('margin-left', avg + '%').html(letter);
+  
+}
+
+
 /* trigger when page is ready */
 $(document).ready(function () {
 
-  /* Load street list */
+// WHY????????
+//  Uncaught TypeError: Object #<an Object> has no method 'getDbProperty'
+//   in vendor/couchapp/jquery.couch.app.js:175
+
+  /* Load street list 
   $.couch.app(function(app) {
     $("#street-results").evently("streets-years", app);
   });
@@ -128,48 +165,53 @@ $(document).ready(function () {
         data : app.db
       }
     });
-  });
+  });*/
 
+  /*
   $("input#street-input").autocomplete({
       source: ["c++", "java", "php", "coldfusion", "javascript", "asp", "ruby"]
   });
+  */
 
-  $('button').click(function() {
+  $('input[name=street]').keyup(function(event) {
 
-    var query = RegExp.esc($('input[name=street]').attr('value'));
+    var query = regesc($(this).attr('value'));
+    if (query.length < 3) return;
 
-    // fetch couch dbView
-    dbView = { rows: [] };
+    // create couch query
+    var url = "_view/streets?group=true";
+    url += "&limit=5";
+    url += "&startkey=%22" + query + "%22";
+//    url += "&endkey=%22" + query + nextLetter(query) + "%22";
 
-
-    $('.eco-houses').html('');
-    var i = 0; var avg = 0;
-    for (var r in dbView.rows) {
-      if (dbView.rows[r].value) {
-        avg += dbView.rows[r].value.IDE_TOT_MJ;
-        i++;
-        var c = 
-          (dbView.rows[r].value.IDE_TOT_MJ > 400) ? "red" :
-          (dbView.rows[r].value.IDE_TOT_MJ < 100) ? "green" : "yellow";
-        if ($('.eco-houses span').length < 10) {
-          $('.eco-houses').append('<span id="' + dbView.rows[r].value.EGID + '" class="eco-house eco-' + c + '">' + c + '</span>');
-        }
+    $.getJSON(url, null, function(data) {
+  
+      // update street list
+      $('#street-results').empty();
+      for (var r in data.rows) {
+        $('#street-results').append("<li>" + data.rows[r].key + "</li>");
       }
-    }
-    $('.eco-slider').show();
 
-    avg = avg / i;
-    avg = 100 * (avg / 500);
+      // create selector for results
+      $('#street-results li').click(function() {
 
-    var letter =  (avg < 20) ? "A" : 
-                  (avg < 40) ? "B" :
-                  (avg < 60) ? "C" :
-                  (avg < 80) ? "D" :
-                  (avg < 90) ? "E" :
-                  "F";
-    
-    $('.eco-slider .arrow').css('margin-left', avg + '%').html(letter);
-    
+        var val = regesc($(this).text());
+        
+        // create couch query for results
+        var url = "_view/street-years?";
+        url += "&startkey=%22" + val + "%22";
+        url += "&endkey=%22" + val + "%22";
+
+        $.getJSON(url, null, function(data) {
+  
+          showStreetResults(data);
+
+        });
+  
+      });
+
+    });
+
   });
 
 });
