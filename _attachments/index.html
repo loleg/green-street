@@ -1,0 +1,222 @@
+<!doctype html>
+
+<!--[if lt IE 7 ]> <html class="ie ie6 no-js" lang="en"> <![endif]-->
+<!--[if IE 7 ]>    <html class="ie ie7 no-js" lang="en"> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie ie8 no-js" lang="en"> <![endif]-->
+<!--[if IE 9 ]>    <html class="ie ie9 no-js" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<!-- the "no-js" class is for Modernizr. -->
+
+<head id="opendata-utou-ch" data-template-set="html5-reset">
+
+	<meta charset="utf-8">
+	
+	<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+	<title>Route Verte</title>
+	
+	<meta name="title" content="">
+	<meta name="description" content="">
+	<!-- Google will often use this as its description of your page/site. Make it good. -->
+	
+	<meta name="google-site-verification" content="">
+	<!-- Speaking of Google, don't forget to set your site up: http://google.com/webmasters -->
+	
+	<meta name="author" content="Oleg Lavrovsky and Vasko Vitanov">
+	<meta name="Copyright" content="Copyleft 2011. All Rights Reserved.">
+
+	<!-- Dublin Core Metadata : http://dublincore.org/ -->
+	<meta name="DC.title" content="Route Verte">
+	<meta name="DC.subject" content="Find out how green your street is">
+	<meta name="DC.creator" content="Make.OpenData.ch">
+
+	<!-- CSS: screen, mobile & print are all in the same file -->
+	<link rel="stylesheet" href="css/style.css">
+	
+  <!-- Extra libs -->
+  <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  
+</head>
+
+<body>
+
+<div class="wrapper"><!-- not needed? up to you: http://camendesign.com/code/developpeurs_sans_frontieres -->
+
+	<header>
+		
+		<h1><a href="/">Route Verte <span style="color:#99f">Lausanne</span></a></h1>
+			
+	</header>
+	
+	<article>
+
+		<p>Type the name of your street and we'll show you how green it is!</p>
+	
+		<label for="street">Street name</label>
+    <input type="text" id="street-input" name="street" />
+    <button id="street-search">GO</button>
+		
+    <div id="street-results"></div>
+			
+	</article>
+
+  <result>
+
+    <div class="eco-houses">
+    </div>
+
+    <div class="eco-slider"><span class="arrow">A</span></div>
+
+  </result>
+
+  <div class="map">
+    <div id="resultMap"></div>
+  </div>
+	
+	<footer>
+		
+		<p><small>Created for Swiss Open Data Camp 2011</small></p>
+		
+	</footer>
+
+</div>
+
+<!-- here comes the javascript -->
+<script src="vendor/couchapp/loader.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+<sscript type="text/javascript" src="http://api.geo.admin.ch/loader.js"></sscript>
+
+<!-- this is where we put our custom functions -->
+<script>
+var resultMap;
+
+function regesc(text) {
+  if (! arguments.callee.sRE) {
+    var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\' ];
+    arguments.callee.sRE = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
+  }
+  return text.replace(arguments.callee.sRE, '\\$1');
+};
+
+function nextLetter(s) {
+    return s.replace(/([a-zA-Z])[^a-zA-Z]*$/, function(a){
+        var c= a.charCodeAt(0);
+        switch(c){
+            case 90: return 'A';
+            case 122: return 'a';
+            default: return String.fromCharCode(++c);
+        }
+    });
+}
+
+/* trigger when page is ready */
+$(document).ready(function () {
+
+  /* Load street list */
+  $.couch.app(function(app) {
+    $("#street-results").evently("streets-years", app);
+  });
+
+  $.couch.app(function(app) {
+    console.log("loading db");
+    console.log(app);
+    $("#street-results").evently({
+      _init : {
+        mustache : '<p>The db name is <strong>{{name}}</strong></p>',
+        data : app.db
+      }
+    });
+  });
+
+  $("input#street-input").autocomplete({
+      source: ["c++", "java", "php", "coldfusion", "javascript", "asp", "ruby"]
+  });
+
+  $('button').click(function() {
+
+    var query = RegExp.esc($('input[name=street]').attr('value'));
+
+    // fetch couch dbView
+    dbView = { rows: [] };
+
+
+    $('.eco-houses').html('');
+    var i = 0; var avg = 0;
+    for (var r in dbView.rows) {
+      if (dbView.rows[r].value) {
+        avg += dbView.rows[r].value.IDE_TOT_MJ;
+        i++;
+        var c = 
+          (dbView.rows[r].value.IDE_TOT_MJ > 400) ? "red" :
+          (dbView.rows[r].value.IDE_TOT_MJ < 100) ? "green" : "yellow";
+        if ($('.eco-houses span').length < 10) {
+          $('.eco-houses').append('<span id="' + dbView.rows[r].value.EGID + '" class="eco-house eco-' + c + '">' + c + '</span>');
+        }
+      }
+    }
+    $('.eco-slider').show();
+
+    avg = avg / i;
+    avg = 100 * (avg / 500);
+
+    var letter =  (avg < 20) ? "A" : 
+                  (avg < 40) ? "B" :
+                  (avg < 60) ? "C" :
+                  (avg < 80) ? "D" :
+                  (avg < 90) ? "E" :
+                  "F";
+    
+    $('.eco-slider .arrow').css('margin-left', avg + '%').html(letter);
+    
+  });
+
+});
+
+$(window).load(function() {
+
+  // evently for social functions
+/*
+  $.couch.app(function(app) {
+    $("#account").evently("account", app);
+    $("#profile").evently("profile", app);
+    $.evently.connect("#account","#profile", ["loggedIn","loggedOut"]);
+    $("#items").evently("items", app);
+  });
+*/
+/*
+  // display map
+  var geo = new GeoAdmin.API();
+  resultMap = geo.createMap({
+     div: "resultMap",
+     easting: 536625,
+     northing: 152465,
+     zoom: 8
+  });	
+*/
+
+});
+
+</script>
+
+<!-- Asynchronous google analytics; this is the official snippet.
+	 Replace UA-XXXXXX-XX with your site's ID and uncomment to enable.
+	 
+<script>
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-XXXXXX-XX']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+-->
+  
+</body>
+</html>
