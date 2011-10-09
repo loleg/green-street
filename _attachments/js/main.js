@@ -103,23 +103,54 @@ $(document).ready(function () {
         $('#street-results').append("<li>" + data.rows[r].key + "</li>");
       }
 
-      // create selector for results
+      // create selector for street results
       $('#street-results li').click(function() {
-
 
         var val = regesc($(this).text());
         $('input[name=street]').attr('value', val);
 
-        // create couch query for results
+        // create couch query for years
         var url = "_view/street-years?";
         url += "&startkey=%22" + val + "%22";
         url += "&endkey=%22" + val + "%22";
 
         $.getJSON(url, null, function(data) {
   
-          showStreetData(data);
+         // showStreetData(data);
 
           $('#street-results').empty();
+          var years = [];
+          for (var r in data.rows) {
+            var y = data.rows[r].value;
+            if (years.indexOf(y) == -1) {
+              years.push(y);
+            }
+          }
+
+          years.sort().forEach(function(y) {
+            $('#street-results').append("<li>" + y + "</li>");
+          });
+
+          // create selector for year results
+          $('#street-results li').click(function() {
+        
+            var year = regesc($(this).text());
+            var street = $('input[name=street]').attr('value');
+            $('input[name=street]').attr('value', street + " " + year);
+
+            // create couch query for results
+            var url = "_view/yearly-average?group=true";
+            var key = "[%22" + street + "%22," + year + "]";
+            url += "&startkey=" + key;
+            url += "&endkey=" + key;
+
+            $.getJSON(url, null, function(data) {
+      
+              showStreetData(data);
+
+            });
+
+          });
 
         });
   
