@@ -106,13 +106,13 @@ $(document).ready(function () {
       // create selector for street results
       $('#street-results li').click(function() {
 
-        var val = regesc($(this).text());
-        $('input[name=street]').attr('value', val);
+        var street = regesc($(this).text());
+        $('input[name=street]').attr('value', street);
 
         // create couch query for years
         var url = "_view/street-years?";
-        url += "&startkey=%22" + val + "%22";
-        url += "&endkey=%22" + val + "%22";
+        url += "&startkey=%22" + street + "%22";
+        url += "&endkey=%22" + street + "%22";
 
         $.getJSON(url, null, function(data) {
   
@@ -127,30 +127,30 @@ $(document).ready(function () {
             }
           }
 
-          years.sort().forEach(function(y) {
-            $('#street-results').append("<li>" + y + "</li>");
-          });
-
-          // create selector for year results
-          $('#street-results li').click(function() {
-        
-            var year = regesc($(this).text());
-            var street = $('input[name=street]').attr('value');
-            $('input[name=street]').attr('value', street + " " + year);
-
+          if (years.length > 0) {
+            years = years.sort();
+            
+            var firstYear = years[0];
+            var lastYear = years[years.length-1];
+          
             // create couch query for results
             var url = "_view/yearly-average?group=true";
-            var key = "[%22" + street + "%22," + year + "]";
-            url += "&startkey=" + key;
-            url += "&endkey=" + key;
+            url += "&startkey=" + "[%22" + street + "%22," + firstYear + "]";
+            url += "&endkey=" + "[%22" + street + "%22," + lastYear + "]";
 
             $.getJSON(url, null, function(data) {
-      
+
+              for (var r in data.rows) {
+                var k = data.rows[r].key;
+                var v = data.rows[r].value;
+                $('#street-results').append('<li>' + k + ' - ' + v + '</li>');
+              }
+
               showStreetData(data);
 
             });
 
-          });
+          }
 
         });
   
