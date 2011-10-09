@@ -165,7 +165,7 @@ article label { display:none; }
 
 article input[type=text] { font-size:2em; width:400px; }
 
-#street-results ul { width:400px; }
+#street-results { width:400px; }
 #street-results li { border:1px solid #88c; background:#ccf; padding:2px; cursor:pointer; }
 #street-results li:hover { background:#ee8; }
 
