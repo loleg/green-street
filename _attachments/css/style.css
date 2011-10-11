@@ -145,45 +145,56 @@ a:link {-webkit-tap-highlight-color: #fcd700;}
 ins {background-color: #fcd700; color: #000; text-decoration: none;}
 mark {background-color: #fcd700; color: #000; font-style: italic; font-weight: bold;}
 
-
 .wrapper { 
   text-align:center;
-  width:90%; background-color:#fff; 
-  padding:1em; margin:0 3em; 
+  padding:1em; margin:0 1em; 
   font-size:140%;
 }
 
 body { background-color:#eee; }
 
-header h1 { margin-top:0; }
-
+header { margin-bottom:1em; }
+header h1 { margin-top: 5em; font-size:18pt; display: inline-block; font-size: 11pt; width: 20em; padding:0 1em; line-height:2.5em; text-shadow:#ddd 0.1em 0.1em; }
+header h1 b { font-size:115%; color:#daa; }
 header h1 a { color:#6e6; font-size:3em; text-decoration:none; }
 
-article { left: 50%;
-margin-left: -250px;
-position: relative;
-width: 500px; }
+h2.city { background: #090; border: 6px solid #FFF; color: white;
+  position:absolute; top:0.5em; left: 50%; margin-left:-3.2em; z-index: 2;
+  padding: 0.7em; border-radius:6px; -moz-border-radius:6px; -webkit-border-radius:6px; }
+.city-pole { position:absolute; left:50%; width:0px; border: 4px solid #999; 
+  height: 8em; top: 2em; z-index: 1; }
 
+article { left: 50%; margin-left: -250px; margin-bottom:0.5em; position: relative; width: 500px; }
 article p { margin:1em 0; font-style:italic; color:#999; }
-
 article label { display:none; }
-
 article input[type=text] { font-size:2em; width:100%; }
 
-#street-results li { border:1px solid #88c; background:#ccf; padding:2px; cursor:pointer; }
-#street-results li:hover { background:#ee8; }
+.panel { display:inline-block; padding:1em; margin:5px; background:#fff;
+  max-height: 360px; width:44%; vertical-align:top; overflow-x: hidden; overflow-y: auto;
+  border:1px solid #ddd; border-radius:20px; -moz-border-radius:20px; -webkit-border-radius:20px; }
 
-.eco-house { display:inline-block; clear:none; font-size:0px; color:#fff; width:64px; height:64px; } 
+#street-results li { border:1px solid #ccf; background:#def; padding:2px; cursor:pointer; }
+#street-results li:hover { background:#ea8; }
 
-.eco-houses { clear:both; }
+#eco-houses p i { display:block; }
+#eco-houses span { display:inline-block; clear:none; font-size:0px; 
+  color:#fff; width:64px; height:64px; margin:5px; } 
+#eco-house-year { color: #eee; float: left; font-size: 4em; font-weight: bold; line-height: 1em; 
+  text-shadow: #777 0.05em 0.03em; padding-right:20px; }
 
 .eco-green { background:url(64green_house.png); }
 .eco-yellow { background:url(64yellow_house.png); }
 .eco-red { background:url(64red_house.png); }
 
-.eco-slider { display:none;
+#eco-barchart { text-align:left; width:500px; }
+#eco-barchart span { display:block; clear:none; overflow:hidden; height:32px; }
+#eco-barchart .eco-year { cursor:pointer; }
+#eco-barchart .eco-year:hover { background:#ee9; }
 
-  width:100%; height:32px; text-align:left; 
+.eco-bar {
+
+  width:500px; height:32px;
+
   background-image: linear-gradient(bottom, rgb(10,255,96) 10%, rgb(222,212,29) 51%, rgb(255,56,56) 68%);
   background-image: -o-linear-gradient(bottom, rgb(10,255,96) 10%, rgb(222,212,29) 51%, rgb(255,56,56) 68%);
   background-image: -moz-linear-gradient(bottom, rgb(10,255,96) 10%, rgb(222,212,29) 51%, rgb(255,56,56) 68%);
@@ -199,16 +210,9 @@ article input[type=text] { font-size:2em; width:100%; }
 	  color-stop(0.68, rgb(255,56,56))
   );
   
-  margin-bottom:4em;
 }
 
-.eco-slider .arrow { display:inline-block; 
-  font-size:3em; text-align:center; color:#aaa; padding-top:7px; padding-left:54px; font-weight:bold;
-  width:64px; height:64px; background:url(arrow_up.png) no-repeat top left;
-  margin-top:12px; margin-left:50%; }
-
-.map { text-align:left; }
-#resultMap { width:100%; height:300px; border:1px solid grey;padding: 0 0 0 0;margin:10px !important; }
+#resultMap { width:100%; height:300px; border:1px solid grey; padding: 0 0 0 0; margin:10px !important; }
 
 /* Print styles!
 -------------------------------------------------------------------------------*/

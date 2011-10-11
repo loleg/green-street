@@ -1,12 +1,12 @@
 function(keys, values) {
-  var low = 250;
-  var mid = 800;
+  var RANGE_LOW = 250;
+  var RANGE_MID = 800;
   var ll = mm = hh = t = 0;
   for (var v in values) {
     t += values[v];
-    if (values[v] < low) {
+    if (values[v] < RANGE_LOW) {
       ll++;
-    } else if (values[v] < mid) {
+    } else if (values[v] < RANGE_MID) {
       mm++;
     } else {
       hh++;

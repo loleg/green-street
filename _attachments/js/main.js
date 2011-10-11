@@ -1,5 +1,5 @@
 
-var resultMap;
+var resultMap, yearData;
 
 // clean text for use in regexp searches
 function regesc(text) {
@@ -22,69 +22,83 @@ function nextLetter(s) {
     });
 }
 
-function showStreetData(dbView) {
+function showChartData(years) {
 
-  $('.eco-houses').html('');
-  var i = 0; var avg = 0;
-  for (var r in dbView.rows) {
-    if (dbView.rows[r].value) {
-      avg += dbView.rows[r].value.IDE_TOT_MJ;
-      i++;
-      var c = 
-        (dbView.rows[r].value.IDE_TOT_MJ > 400) ? "red" :
-        (dbView.rows[r].value.IDE_TOT_MJ < 100) ? "green" : "yellow";
-      if ($('.eco-houses span').length < 10) {
-        $('.eco-houses').append('<span id="' + dbView.rows[r].value.EGID + '" class="eco-house eco-' + c + '">' + c + '</span>');
-      }
+  $('#eco-barchart').html('');
+
+  var AVG_MAX = 900;
+
+  // plot years
+  for (var y in years) {
+
+    var a = years[y].avg;
+    if (a > AVG_MAX) a = AVG_MAX;
+    a = Math.floor(a/2) + "px";
+    
+    $('#eco-barchart').append(
+      '<div class="eco-year"><b>' + years[y].year + '</b>'
+      + ' - <i>' + years[y].avg.toFixed(1) + ' MJ</i>'
+      + '<span style="width:' + a + '"><div class="eco-bar">&nbsp;</div></span>' 
+      + '</div>');
+  }
+
+}
+
+function showHouseData(range3, year) {
+
+  $('#eco-houses').html('');
+  $('#eco-house-year').html(year);
+
+  range3 = range3.slice(0, 3);
+
+  // get total
+  var t = 0;
+  for (var r in range3) {
+    t += range3[r];
+  }
+
+  // adjust values for too many houses
+  var tMAX = 16;
+  if (t > tMAX) {
+    for (var r in range3) {
+      range3[r] = Math.floor(tMAX * range3[r] / t);
     }
   }
-  $('.eco-slider').show();
 
-  avg = avg / i;
-  avg = 100 * (avg / 500);
+  // show each range
+  for (var r in range3) {
+    var c = 
+      (r == 2) ? "red" :
+      (r == 0) ? "green" : "yellow";
+    for (var i = 0; i < range3[r]; i++) {
+      $('#eco-houses').append('<span class="eco-' + c + '">' + c + '</span>');
+    }
+  }
 
-  var letter =  (avg < 20) ? "A" : 
-                (avg < 40) ? "B" :
-                (avg < 60) ? "C" :
-                (avg < 80) ? "D" :
-                (avg < 90) ? "E" :
-                "F";
-  
-  $('.eco-slider .arrow').css('margin-left', avg + '%').html(letter);
-  
+  // write a little text
+  var s = (t == 1) ? '' : 's';
+  $('#eco-house-text').html(
+    '<p>Nous connaissons ' + t + ' maison' + s + ' sur cette rue. ' +
+    '<i>We know about ' + t + ' house' + s + ' on this street.</i></p>');
+
 }
 
 
 /* trigger when page is ready */
 $(document).ready(function () {
 
-// WHY????????
-//  Uncaught TypeError: Object #<an Object> has no method 'getDbProperty'
-//   in vendor/couchapp/jquery.couch.app.js:175
+  var EXAMPLE_SEARCH = 'Avenue de ...';
+  $('.panel').hide();
 
-  /* Load street list 
-  $.couch.app(function(app) {
-    $("#street-results").evently("streets-years", app);
-  });
-
-  $.couch.app(function(app) {
-    console.log("loading db");
-    console.log(app);
-    $("#street-results").evently({
-      _init : {
-        mustache : '<p>The db name is <strong>{{name}}</strong></p>',
-        data : app.db
-      }
-    });
-  });*/
-
-  /*
-  $("input#street-input").autocomplete({
-      source: ["c++", "java", "php", "coldfusion", "javascript", "asp", "ruby"]
-  });
-  */
-
-  $('input[name=street]').keyup(function(event) {
+  // setup search input
+  $('input[name=street]')
+  .attr('value', EXAMPLE_SEARCH).css({color:'#AAA',fontStyle:'italic'})
+  .focus(function() {
+    if ($(this).attr('value') == EXAMPLE_SEARCH) {
+      $(this).attr('value', '').css({color:'#333',fontStyle:'normal'});
+    }
+  })
+  .keyup(function(event) {
 
     var query = regesc($(this).attr('value'));
     if (query.length < 3) return;
@@ -116,9 +130,8 @@ $(document).ready(function () {
 
         $.getJSON(url, null, function(data) {
   
-         // showStreetData(data);
-
           $('#street-results').empty();
+
           var years = [];
           for (var r in data.rows) {
             var y = data.rows[r].value;
@@ -140,13 +153,33 @@ $(document).ready(function () {
 
             $.getJSON(url, null, function(data) {
 
+              var year_avg = []; 
+              var top_year = {};
               for (var r in data.rows) {
                 var k = data.rows[r].key;
                 var v = data.rows[r].value;
-                $('#street-results').append('<li>' + k + ' - ' + v + '</li>');
+                year_avg.push({ year:k[1], avg:v[3] });
+                if (k[1] == lastYear) top_year = data.rows[r].value;
+                //debug: $('#street-results').append('<li>' + k + ' - ' + v + '</li>');
               }
 
-              showStreetData(data);
+              // show the most current data
+              showHouseData(top_year, lastYear);
+              showChartData(year_avg);
+
+              // create click event
+              yearData = data;
+              $('#eco-barchart .eco-year').click(function() {
+                var targetYear = parseInt($('b', this).text());
+                for (var r in yearData.rows) {
+                  if (data.rows[r].key[1] == targetYear) {
+                    showHouseData(data.rows[r].value, targetYear);
+                  }
+                }
+              });
+              
+              // show all panels
+              $('.panel').show();
 
             });
 

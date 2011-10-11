@@ -42,15 +42,14 @@
 
 	<header>
 		
-		<h1><a href="/">Ma Rue, est-elle verte? <span style="color:#99f">Lausanne</span></a></h1>
-    <h1><small><a href="/">How green is my street?</a></small></h1>
+		<h1 class="fr"><a href="/"><b>Ma Rue—</b> est-elle verte?</a></h1>
+    <h1 class="en"><a href="/">How green is <b>my street</b>?</a></h1>
+    <h2 class="city">Lausanne</h2><div class="city-pole"/>
 			
 	</header>
 	
 	<article>
 
-		<p>Find your street and we'll show you how green it is!</p>
-	
 		<label for="street">Street name:</label>
     <input type="text" name="street" />
 		
@@ -58,22 +57,29 @@
 			
 	</article>
 
-  <result>
+  <result class="panel">
 
-    <div class="eco-houses">
-    </div>
-
-    <div class="eco-slider"><span class="arrow">A</span></div>
+    <span id="eco-house-year"></span>
+    <div id="eco-house-text"></div>
+    <div id="eco-houses"></div>
 
   </result>
 
-  <div class="map">
+  <chart class="panel">
+
+    <div id="eco-barchart"></div>
+
+  </chart>
+
+  <map class="panel">
+
     <div id="resultMap"></div>
-  </div>
+
+  </map>
 	
 	<footer>
 		
-		<p><small>Created for Swiss Open Data Camp 2011</small></p>
+		<p><small>Created by <a href="http://oleg.utou.ch" target="_blank">Oleg Lavrovsky</a> and Vasko Vitanov for <a href="http://make.opendata.ch" target="_blank">Swiss Open Data Camp</a> 2011</small></p>
 		
 	</footer>
 
@@ -83,11 +89,12 @@
 <script src="vendor/couchapp/loader.js"></script>
 
 <!-- Geo Admin API for showing a map 
-<script type="text/javascript" src="http://api.geo.admin.ch/loader.js"></sscript>
+<script type="text/javascript" src="http://api.geo.admin.ch/loader.js"></script>
 -->
 
-<!-- Raphael for drawing graphs -->
+<!-- Raphael for drawing graphs
 <script type="text/javascript" charset="utf-8" src="js/raphael-min.js"></script>
+ -->
 
 <!-- this is where we put our custom functions -->
 <script type="text/javascript" charset="utf-8" src="js/main.js"></script>
