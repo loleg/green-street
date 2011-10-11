@@ -22,6 +22,12 @@ function nextLetter(s) {
     });
 }
 
+// centers the map on the search result
+function showMap(x, y) {
+  $('#resultMap').html('<iframe width="90%" height="100%" frameborder="0" src="http://mobile.map.geo.admin.ch/?mobile=true&lang=en&zoom=8&scale=5000&X=' + x + '&Y=' + y + '&bgLayer=ch.swisstopo.pixelkarte-farbe&bgOpacity=1"></iframe>');
+}
+
+// creates a bar chart
 function showChartData(years) {
 
   $('#eco-barchart').html('');
@@ -166,7 +172,7 @@ $(document).ready(function () {
               // show the most current data
               showHouseData(top_year, lastYear);
               showChartData(year_avg);
-
+              
               // create click event
               yearData = data;
               $('#eco-barchart .eco-year').click(function() {
@@ -180,7 +186,18 @@ $(document).ready(function () {
               
               // show all panels
               $('.panel').show();
+              
+            });
+            
+            // create couch query for map
+            url = "_view/street-location?group=true";
+            url += "&startkey=" + "[%22" + street + "%22," + firstYear + "]";
+            url += "&endkey=" + "[%22" + street + "%22," + lastYear + "]";
 
+            $.getJSON(url, null, function(data) {
+              var x = data.rows[0].value[0];
+              var y = data.rows[0].value[1];
+              showMap(x, y);
             });
 
           }
