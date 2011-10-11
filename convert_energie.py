@@ -85,7 +85,7 @@ def csv_to_couch_dump():
     i = i + 1
 
     # comment out these two lines to grab all data (30 min on my machine..)
-    if i == 1000:
+    if i == 5000:
       break
 
   print i

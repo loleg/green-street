@@ -24,6 +24,8 @@ function nextLetter(s) {
 
 // centers the map on the search result
 function showMap(x, y) {
+  x = 152427;
+  y = 536668;
   $('#resultMap').html('<iframe width="90%" height="100%" frameborder="0" src="http://mobile.map.geo.admin.ch/?mobile=true&lang=en&zoom=8&scale=5000&X=' + x + '&Y=' + y + '&bgLayer=ch.swisstopo.pixelkarte-farbe&bgOpacity=1"></iframe>');
 }
 
