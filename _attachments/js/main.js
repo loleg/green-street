@@ -22,6 +22,18 @@ function nextLetter(s) {
     });
 }
 
+// set up the progress indicator (spin.js)
+var spinner = new Spinner({
+    lines: 12, // The number of lines to draw
+    length: 4, // The length of each line
+    width: 3, // The line thickness
+    radius: 8, // The radius of the inner circle
+    color: '#000', // #rgb or #rrggbb
+    speed: 1, // Rounds per second
+    trail: 60, // Afterglow percentage
+    shadow: false // Whether to render a shadow
+  });
+
 // centers the map on the search result
 function showMap(y, x) {
   //x = 152427;
@@ -125,7 +137,9 @@ $(document).ready(function () {
     url += "&startkey=%22" + query + "%22";
 //    url += "&endkey=%22" + query + nextLetter(query) + "%22";
 
+    spinner.spin($('#sugar')[0]);
     $.getJSON(url, null, function(data) {
+      spinner.stop($('#sugar')[0]);
   
       // update street list
       $('#street-results').empty();
@@ -144,7 +158,9 @@ $(document).ready(function () {
         url += "&startkey=%22" + street + "%22";
         url += "&endkey=%22" + street + "%22";
 
+        spinner.spin($('#sugar')[0]);
         $.getJSON(url, null, function(data) {
+          spinner.stop($('#sugar')[0]);
   
           $('#street-results').empty();
 
@@ -167,7 +183,9 @@ $(document).ready(function () {
             url += "&startkey=" + "[%22" + street + "%22," + firstYear + "]";
             url += "&endkey=" + "[%22" + street + "%22," + lastYear + "]";
 
+            spinner.spin($('#sugar')[0]);
             $.getJSON(url, null, function(data) {
+              spinner.stop($('#sugar')[0]);
 
               var year_avg = []; 
               var top_year = {};
