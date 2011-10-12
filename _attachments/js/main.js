@@ -36,9 +36,14 @@ var spinner = new Spinner({
 
 // centers the map on the search result
 function showMap(y, x) {
-  //x = 152427;
-  //y = 536668;
-  $('#resultMap').html('<iframe width="90%" height="100%" frameborder="0" src="http://mobile.map.geo.admin.ch/?mobile=true&lang=en&zoom=8&scale=5000&X=' + x + '&Y=' + y + '&bgLayer=ch.swisstopo.pixelkarte-farbe&bgOpacity=1"></iframe>');
+	var mapframe = '<iframe width="90%" height="100%" frameborder="0" src="http://mobile.map.geo.admin.ch/?mobile=true&lang=en&zoom=8&scale=5000&X=' + x + '&Y=' + y + '&bgLayer=ch.swisstopo.pixelkarte-farbe&bgOpacity=1"></iframe>';
+	if ($('#resultMap').text().indexOf('Click') > -1) {
+		$('#resultMap').click(function() {
+			$(this).html(mapframe);
+		});
+	} else {
+		$('#resultMap').html(mapframe);
+	}
 }
 
 // creates a bar chart
@@ -212,7 +217,7 @@ $(document).ready(function () {
         $.getJSON(url, null, function(data) {
           var x = data.rows[0].value[0];
           var y = data.rows[0].value[1];
-          //showMap(x, y);
+          showMap(x, y);
         });
   
       }); // end street results
