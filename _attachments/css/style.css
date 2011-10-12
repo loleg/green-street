@@ -151,13 +151,15 @@ mark {background-color: #fcd700; color: #000; font-style: italic; font-weight: b
   font-size:140%;
 }
 
-body { background-color:#eee; }
+body { background:#eee url(https://a248.e.akamai.net/assets.github.com/img/30f550e0d38ceb6ef5b81500c64d970b7fb0f028/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67) top right no-repeat; }
 
 header { margin-bottom:1em; }
 header h1 { margin-top: 5em; font-size:18pt; display: inline-block; font-size: 11pt; width: 20em; padding:0 1em; line-height:2.5em; text-shadow:#ddd 0.1em 0.1em; }
 header h1 b { font-size:115%; color:#33a; }
 header h1 a { color:#3a3; font-size:3em; text-decoration:none; }
 header h1 a:hover { color:#6e6; font-size:3em; }
+
+footer p { font-size:80%; }
 
 h2.city { background: #090; border: 6px solid #FFF; color: white;
   position:absolute; top:0.5em; left: 50%; margin-left:-3.2em; z-index: 2;
@@ -188,8 +190,10 @@ article input[type=text] { font-size:2em; width:100%; }
 .eco-red { background:url(64red_house.png); }
 
 #eco-barchart { text-align:left; width:500px; }
-#eco-barchart span { display:block; clear:none; overflow:hidden; height:32px; }
-#eco-barchart .eco-year { cursor:pointer; }
+
+#eco-barchart span { display:inline-block; clear:none; overflow:hidden; height:32px; }
+
+#eco-barchart .eco-year { cursor:pointer; margin-bottom:1em; }
 #eco-barchart .eco-year:hover { background:#ee9; }
 
 .eco-bar {
@@ -211,6 +215,19 @@ article input[type=text] { font-size:2em; width:100%; }
 	  color-stop(0.68, rgb(255,56,56))
   );
   
+}
+
+.eco-year i {
+	position: relative;
+	padding: 5px;
+	border: 3px solid #eee;
+	color: #333;
+	background: white;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	top: 3px;
+	margin-left: -5px;
 }
 
 #resultMap { width:100%; height:300px; padding: 0 0 0 0; margin:10px !important; }

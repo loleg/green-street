@@ -23,9 +23,9 @@ function nextLetter(s) {
 }
 
 // centers the map on the search result
-function showMap(x, y) {
-  x = 152427;
-  y = 536668;
+function showMap(y, x) {
+  //x = 152427;
+  //y = 536668;
   $('#resultMap').html('<iframe width="90%" height="100%" frameborder="0" src="http://mobile.map.geo.admin.ch/?mobile=true&lang=en&zoom=8&scale=5000&X=' + x + '&Y=' + y + '&bgLayer=ch.swisstopo.pixelkarte-farbe&bgOpacity=1"></iframe>');
 }
 
@@ -40,14 +40,22 @@ function showChartData(years) {
   for (var y in years) {
 
     var a = years[y].avg;
-    if (a > AVG_MAX) a = AVG_MAX;
-    a = Math.floor(a/2) + "px";
-    
-    $('#eco-barchart').append(
-      '<div class="eco-year"><b>' + years[y].year + '</b>'
-      + ' - <i>' + years[y].avg.toFixed(1) + ' MJ</i>'
-      + '<span style="width:' + a + '"><div class="eco-bar">&nbsp;</div></span>' 
-      + '</div>');
+    if (a != null) {
+		if (a > AVG_MAX) a = AVG_MAX;
+
+		var dmargin = (a < 50) ?
+				' style="margin-left:0.1em"' :
+			(a > 700) ?
+				' style="margin-left:-6em"' : '';
+		
+		$('#eco-barchart').append(
+		  '<div class="eco-year"><b>' + years[y].year + '</b>'
+		  + '<span style="width:' + Math.floor(a/2) + 'px">'
+		  + '<div class="eco-bar">&nbsp;</div></span>' 
+		  + '<i' + dmargin + '>' + years[y].avg.toFixed(1) + ' MJ</i>'
+		  + '</div>');
+		  
+	}
   }
 
 }
@@ -86,8 +94,8 @@ function showHouseData(range3, year) {
   // write a little text
   var s = (t == 1) ? '' : 's';
   $('#eco-house-text').html(
-    '<p>Nous connaissons ' + t + ' maison' + s + ' sur cette rue. ' +
-    '<i>We know about ' + t + ' house' + s + ' on this street.</i></p>');
+    '<p>Nous connaissons ' + t + ' batiment' + s + ' sur cette rue. ' +
+    '<i>We know about ' + t + ' building' + s + ' here.</i></p>');
 
 }
 
@@ -193,8 +201,8 @@ $(document).ready(function () {
             
             // create couch query for map
             url = "_view/street-location?group=true";
-            url += "&startkey=" + "[%22" + street + "%22," + firstYear + "]";
-            url += "&endkey=" + "[%22" + street + "%22," + lastYear + "]";
+            url += "&startkey=" + "%22" + street + "%22";
+            url += "&endkey=" + "%22" + street + "%22";
 
             $.getJSON(url, null, function(data) {
               var x = data.rows[0].value[0];

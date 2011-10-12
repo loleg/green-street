@@ -83,6 +83,9 @@ def csv_to_couch_dump():
 
     batiment.save()
     i = i + 1
+    
+    if i%1000 == 0:
+      print "Processed %d buildings" % i
 
     # comment out these two lines to grab all data (30 min on my machine..)
     if i == 5000:
