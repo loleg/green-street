@@ -127,7 +127,9 @@ $(document).ready(function () {
     }
   })
   .keyup(function(event) {
-
+  // 250ms debounce
+  $(this).doTimeout( 'typing', 250, function() {
+  
     var query = regesc($(this).attr('value'));
     if (query.length < 3) return;
 
@@ -228,16 +230,17 @@ $(document).ready(function () {
               showMap(x, y);
             });
 
-          }
+          } // end check for year length
 
-        });
+        }); // end year query
   
-      });
+      }); // end street results
 
-    });
+    }); // end streetname query
 
-  });
-
+  }); // end debounce
+  }); // end search input
+  
 });
 
 $(window).load(function() {
