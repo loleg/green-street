@@ -269,8 +269,7 @@ article input[type=text] { font-size:2em; width:100%; }
 @media screen and (max-device-width: 480px) {
 	
 	.panel { width:100%; }
-	.city-pole { display:none; }
-	.city { left:0em; top:0em; margin:0; }
+	.city-pole, .city { display:none; }
 	header h1 { margin-top: 0; }
 	article input[type="text"] { width:70%; }
 	

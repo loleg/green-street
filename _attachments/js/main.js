@@ -154,85 +154,66 @@ $(document).ready(function () {
 
         var street = regesc($(this).text());
         $('input[name=street]').attr('value', street);
-
-        // create couch query for years
-        var url = "_view/street-years?";
-        url += "&startkey=%22" + street + "%22";
-        url += "&endkey=%22" + street + "%22";
+        
+        var firstYear = 1990, lastYear = 2020;
+      
+        // create couch query for results
+        var url = "_view/yearly-average?group=true";
+        url += "&startkey=" + "[%22" + street + "%22," + firstYear + "]";
+        url += "&endkey=" + "[%22" + street + "%22," + lastYear + "]";
 
         spinner.spin($('#sugar')[0]);
         $.getJSON(url, null, function(data) {
           spinner.stop($('#sugar')[0]);
-  
-          $('#street-results').empty();
 
-          var years = [];
+          var year_avg = []; 
+          var top_year = {};
+          lastYear = 1900;
           for (var r in data.rows) {
-            var y = data.rows[r].value;
-            if (years.indexOf(y) == -1) {
-              years.push(y);
+            var k = data.rows[r].key;
+            var v = data.rows[r].value;
+            year_avg.push({ year:k[1], avg:v[3] });
+            if (k[1] > lastYear) {
+            	lastYear = k[1];
+            	top_year = data.rows[r].value;
             }
+            //debug: $('#street-results').append('<li>' + k + ' - ' + v + '</li>');
           }
-
-          if (years.length > 0) {
-            years = years.sort();
-            
-            var firstYear = years[0];
-            var lastYear = years[years.length-1];
           
-            // create couch query for results
-            var url = "_view/yearly-average?group=true";
-            url += "&startkey=" + "[%22" + street + "%22," + firstYear + "]";
-            url += "&endkey=" + "[%22" + street + "%22," + lastYear + "]";
+          // cancel if we have an error
+          if (year_avg.length == 0) return;
 
-            spinner.spin($('#sugar')[0]);
-            $.getJSON(url, null, function(data) {
-              spinner.stop($('#sugar')[0]);
-
-              var year_avg = []; 
-              var top_year = {};
-              for (var r in data.rows) {
-                var k = data.rows[r].key;
-                var v = data.rows[r].value;
-                year_avg.push({ year:k[1], avg:v[3] });
-                if (k[1] == lastYear) top_year = data.rows[r].value;
-                //debug: $('#street-results').append('<li>' + k + ' - ' + v + '</li>');
+          // show the most current data
+          $('#street-results').empty();
+          showHouseData(top_year, lastYear);
+          showChartData(year_avg);
+          
+          // create click event
+          yearData = data;
+          $('#eco-barchart .eco-year').click(function() {
+            var targetYear = parseInt($('b', this).text());
+            for (var r in yearData.rows) {
+              if (data.rows[r].key[1] == targetYear) {
+                showHouseData(data.rows[r].value, targetYear);
               }
+            }
+          });
+          
+          // show all panels
+          $('.panel').show();
+          
+        });
+        
+        // create couch query for map
+        url = "_view/street-location?group=true";
+        url += "&startkey=" + "%22" + street + "%22";
+        url += "&endkey=" + "%22" + street + "%22";
 
-              // show the most current data
-              showHouseData(top_year, lastYear);
-              showChartData(year_avg);
-              
-              // create click event
-              yearData = data;
-              $('#eco-barchart .eco-year').click(function() {
-                var targetYear = parseInt($('b', this).text());
-                for (var r in yearData.rows) {
-                  if (data.rows[r].key[1] == targetYear) {
-                    showHouseData(data.rows[r].value, targetYear);
-                  }
-                }
-              });
-              
-              // show all panels
-              $('.panel').show();
-              
-            });
-            
-            // create couch query for map
-            url = "_view/street-location?group=true";
-            url += "&startkey=" + "%22" + street + "%22";
-            url += "&endkey=" + "%22" + street + "%22";
-
-            $.getJSON(url, null, function(data) {
-              var x = data.rows[0].value[0];
-              var y = data.rows[0].value[1];
-              showMap(x, y);
-            });
-
-          } // end check for year length
-
-        }); // end year query
+        $.getJSON(url, null, function(data) {
+          var x = data.rows[0].value[0];
+          var y = data.rows[0].value[1];
+          //showMap(x, y);
+        });
   
       }); // end street results
 
