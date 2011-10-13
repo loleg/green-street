@@ -91,7 +91,7 @@ function showHouseData(range3, year) {
   }
 
   // adjust values for too many houses
-  var tMAX = 16;
+  var tMAX = 15;
   if (t > tMAX) {
     for (var r in range3) {
       range3[r] = Math.floor(tMAX * range3[r] / t);
