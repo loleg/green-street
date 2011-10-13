@@ -36,7 +36,7 @@ var spinner = new Spinner({
 
 // centers the map on the search result
 function showMap(y, x) {
-	var mapframe = '<iframe width="90%" height="100%" frameborder="0" src="http://mobile.map.geo.admin.ch/?mobile=true&lang=en&zoom=8&scale=5000&X=' + x + '&Y=' + y + '&bgLayer=ch.swisstopo.pixelkarte-farbe&bgOpacity=1"></iframe>';
+	var mapframe = '<iframe width="100%" height="100%" frameborder="0" src="http://mobile.map.geo.admin.ch/?mobile=true&lang=en&zoom=8&scale=5000&X=' + x + '&Y=' + y + '&bgLayer=ch.swisstopo.pixelkarte-farbe&bgOpacity=1"></iframe>';
 	if ($('#resultMap').text().indexOf('Click') > -1) {
 		$('#resultMap').click(function() {
 			$(this).html(mapframe);
