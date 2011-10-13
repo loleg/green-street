@@ -157,8 +157,9 @@ $(document).ready(function () {
       // create selector for street results
       $('#street-results li').click(function() {
 
-        var street = regesc($(this).text());
-        $('input[name=street]').attr('value', street);
+		// grab the selected street and encode for Ajax
+        var street = encodeURI($(this).text());
+        $('input[name=street]').attr('value', $(this).text());
         
         var firstYear = 1990, lastYear = 2020;
       
